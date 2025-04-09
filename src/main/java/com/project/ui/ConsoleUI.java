@@ -32,15 +32,16 @@ public class ConsoleUI {
 
         panel.addComponent(new Label("Выберите действие:"));
         panel.addComponent(new Button("Создать резервную копию", () -> {
-            // Запускаем процесс резервного копирования
+            window.close();
             BackupManager backupManager = new BackupManager();
             backupManager.startBackup();
-            showMessage("Резервное копирование завершено!");
+            System.out.println("Резервное копирование завершено!");
         }));
         panel.addComponent(new Button("Восстановить резервную копию", () -> {
+            window.close();
             RestoreManager restoreManager = new RestoreManager();
             restoreManager.startRestore();
-            showMessage("Восстановление завершено!");
+            System.out.println("Восстановление завершено!");
         }));
         panel.addComponent(new Button("Выход", window::close));
 
