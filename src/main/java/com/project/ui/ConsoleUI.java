@@ -44,7 +44,7 @@ public class ConsoleUI {
             closeGUI();
             BackupManager backupManager = new BackupManager();
             backupManager.startBackup();
-            Logger.log("Резервное копирование завершено!");
+            //Logger.log("Резервное копирование завершено!");
         }));
 
         panel.addComponent(new Button("Восстановить резервную копию", () -> {
@@ -52,7 +52,7 @@ public class ConsoleUI {
             closeGUI();
             RestoreManager restoreManager = new RestoreManager();
             restoreManager.startRestore();
-            Logger.log("Восстановление завершено!");
+            //Logger.log("Восстановление завершено!");
         }));
 
         panel.addComponent(new Button("Настройки", this::showSettingsWindow));
@@ -92,10 +92,25 @@ public class ConsoleUI {
                         System.getProperty("user.home") + "/restores"));
         panel.addComponent(restoreTextBox);
 
+        panel.addComponent(new Label("Сжимать резервную копию:"));
+        CheckBox compressionCheck = new CheckBox();
+        compressionCheck.setChecked(Boolean.parseBoolean(Config.getProperty("backup.compression", "false")));
+        panel.addComponent(compressionCheck);
+
+        panel.addComponent(new Label("Режим резервного копирования:"));
+        RadioBoxList<String> modeSelect = new RadioBoxList<>();
+        modeSelect.addItem("full");
+        modeSelect.addItem("incremental");
+        String currentMode = Config.getProperty("backup.mode", "full");
+        modeSelect.setCheckedItem(currentMode);
+        panel.addComponent(modeSelect);
+
         Button saveButton = new Button("Сохранить", () -> {
             String sourcePath = sourceTextBox.getText().trim();
             String backupPath = backupTextBox.getText().trim();
             String restorePath = restoreTextBox.getText().trim();
+            String chosenMode = modeSelect.getCheckedItem();
+            boolean compressionEnabled = compressionCheck.isChecked();
             StringBuilder message = new StringBuilder();
 
             // Проверка на нахождение каталога резервной копии внутри источника
@@ -106,9 +121,9 @@ public class ConsoleUI {
                 return;
             }
 
-            // Проверка и создание директорий, если их нет
             boolean validationPassed = true;
 
+            // Проверка и создание директорий, если их нет
             try {
                 if (!Files.exists(srcDir)) {
                     Files.createDirectories(srcDir);
@@ -148,6 +163,8 @@ public class ConsoleUI {
                 Config.setProperty("source.directory", sourcePath);
                 Config.setProperty("backup.directory", backupPath);
                 Config.setProperty("restore.directory", restorePath);
+                Config.setProperty("backup.compression", String.valueOf(compressionEnabled));
+                Config.setProperty("backup.mode", chosenMode);
                 Config.saveConfig();
                 message.append("Настройки успешно сохранены.");
             } else {
