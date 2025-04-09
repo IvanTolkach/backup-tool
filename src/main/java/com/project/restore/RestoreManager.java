@@ -11,8 +11,8 @@ public class RestoreManager {
     private String backupDirPath;
 
     public RestoreManager() {
-        restoreDirPath = Config.getProperty("restore.directory", System.getProperty("user.home"));
-        backupDirPath = Config.getProperty("backup.directory", System.getProperty("user.home"));
+        restoreDirPath = Config.getProperty("restore.directory", System.getProperty("user.home")+ "/restores");
+        backupDirPath = Config.getProperty("backup.directory", System.getProperty("user.home")+ "/backups");
     }
 
     public void startRestore() {

@@ -6,6 +6,7 @@ import com.project.config.Config;
 public class Main
 {
     public static void main( String[] args ) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {}));
 
         Config.loadConfig("config.properties");
 

@@ -13,8 +13,8 @@ public class BackupManager {
     private String sourceDirPath;
 
     public BackupManager() {
-        backupDirPath = Config.getProperty("backup.directory", System.getProperty("user.home"));
-        sourceDirPath = Config.getProperty("source.directory", System.getProperty("user.home"));
+        backupDirPath = Config.getProperty("backup.directory", System.getProperty("user.home") + "/backups");
+        sourceDirPath = Config.getProperty("source.directory", System.getProperty("user.home") + "/Documents");
     }
 
     public void startBackup() {
