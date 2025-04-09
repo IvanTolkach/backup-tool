@@ -18,6 +18,9 @@ public class RestoreManager {
     public void startRestore() {
         Logger.log("Начало восстановления резервной копии...");
 
+        Logger.log("Каталог резервных копий: " + backupDirPath);
+        Logger.log("Целевой каталог для восстановления: " + restoreDirPath);
+
         try {
             Path latestBackup = Files.list(Paths.get(backupDirPath))
                     .filter(Files::isDirectory)
@@ -28,6 +31,7 @@ public class RestoreManager {
                 return;
             }
 
+            Logger.log("Будет восстановлена резервная копия из каталога: " + latestBackup.toString());
             Path destination = Paths.get(restoreDirPath);
             Files.createDirectories(destination);
             Files.walk(latestBackup)
@@ -43,7 +47,8 @@ public class RestoreManager {
                             Logger.log("Ошибка при восстановлении файла " + source.toString() + ": " + e.getMessage());
                         }
                     });
-            Logger.log("Восстановление завершено. Данные восстановлены в: " + destination.toString());
+            Logger.log("Восстановление завершено.");
+            Logger.log("Данные восстановлены в: " + destination.toString());
         } catch (IOException e) {
             Logger.log("Ошибка при восстановлении резервной копии: " + e.getMessage());
         }

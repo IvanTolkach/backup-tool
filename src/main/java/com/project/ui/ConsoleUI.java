@@ -14,6 +14,7 @@ import java.io.IOException;
 public class ConsoleUI {
     private Screen screen;
     private MultiWindowTextGUI gui;
+    private BasicWindow mainWindow;
 
     public ConsoleUI() {
         try {
@@ -27,35 +28,43 @@ public class ConsoleUI {
     }
 
     public void start() {
-        final Window window = new BasicWindow("Утилита резервного копирования");
-        Panel panel = new Panel(new GridLayout(1));
+        mainWindow = new BasicWindow("Утилита резервного копирования");
+        Panel panel = new Panel();
 
         panel.addComponent(new Label("Выберите действие:"));
         panel.addComponent(new Button("Создать резервную копию", () -> {
-            window.close();
+            mainWindow.close();
+            closeGUI();
+            Logger.log("Запускаем BackupManager...");
             BackupManager backupManager = new BackupManager();
             backupManager.startBackup();
             Logger.log("Резервное копирование завершено!");
         }));
         panel.addComponent(new Button("Восстановить резервную копию", () -> {
-            window.close();
+            mainWindow.close();
+            closeGUI();
+            Logger.log("Запускаем RestoreManager...");
             RestoreManager restoreManager = new RestoreManager();
             restoreManager.startRestore();
             Logger.log("Восстановление завершено!");
         }));
-        panel.addComponent(new Button("Выход", window::close));
+        panel.addComponent(new Button("Выход", () -> {
+            mainWindow.close();
+            closeGUI();
+            Logger.log("Программа завершена...");
+        }));
 
-        window.setComponent(panel);
-        gui.addWindowAndWait(window);
-
-        try {
-            screen.stopScreen();
-        } catch (IOException e) {
-            Logger.log("Ошибка остановки экрана: " + e.getMessage());
-        }
+        mainWindow.setComponent(panel);
+        gui.addWindowAndWait(mainWindow);
     }
 
-    private void showMessage(String message) {
-        MessageDialog.showMessageDialog(gui, "Сообщение", message, MessageDialogButton.OK);
+    private void closeGUI() {
+        if (screen != null) {
+            try {
+                screen.stopScreen();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

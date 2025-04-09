@@ -20,6 +20,9 @@ public class BackupManager {
     public void startBackup() {
         Logger.log("Начало процесса резервного копирования...");
 
+        Logger.log("Исходная директория для резервного копирования: " + sourceDirPath);
+        Logger.log("Целевой каталог для архивов (если параметр отсутствует, используется домашняя директория): " + backupDirPath);
+
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
         String backupFolderName = "backup_" + now.format(formatter);
@@ -48,7 +51,8 @@ public class BackupManager {
                             Logger.log("Ошибка при копировании файла: " + source.toString() + " " + e.getMessage());
                         }
                     });
-            Logger.log("Резервное копирование завершено. Архив создан в: " + targetDir.toString());
+            Logger.log("Резервное копирование завершено.");
+            Logger.log("Создан каталог резервной копии: " + targetDir.toString());
         } catch (IOException e) {
             Logger.log("Ошибка создания резервной копии: " + e.getMessage());
         }
