@@ -90,7 +90,6 @@ public class ConsoleUI {
         TextBox restoreTextBox = new TextBox(new TerminalSize(textBoxWidth, 1))
                 .setText(Config.getProperty("restore.directory",
                         System.getProperty("user.home") + "/restores"));
-        panel.addComponent(new Label("Каталог для восстановления:"));
         panel.addComponent(restoreTextBox);
 
         Button saveButton = new Button("Сохранить", () -> {
