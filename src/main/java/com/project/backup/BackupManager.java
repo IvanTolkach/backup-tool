@@ -6,6 +6,7 @@ import com.project.util.Logger;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.zip.*;
@@ -52,12 +53,12 @@ public class BackupManager {
                     Logger.log("Некорректное значение last.backup.timestamp. Выполняется полное резервное копирование.");
                 }
             }
-
             final long lastBackupFinal = tempLastBackupTimestamp;
 
             Files.walk(sourceDir)
                     .forEach(source -> {
-                        if (source.toAbsolutePath().startsWith(targetDir.toAbsolutePath())) return;
+                        if (source.toAbsolutePath().startsWith(targetDir.toAbsolutePath()))
+                            return;
 
                         if ("incremental".equalsIgnoreCase(backupMode) && Files.isRegularFile(source)) {
                             try {
@@ -91,12 +92,13 @@ public class BackupManager {
                 Logger.log("Создается архив резервной копии: " + zipFile);
                 zipDirectory(targetDir, zipFile);
                 Logger.log("Архив создан: " + zipFile.toString());
+
+                deleteDirectoryRecursively(targetDir);
             }
         } catch (IOException e) {
             Logger.log("Ошибка при создании резервной копии: " + e.getMessage());
         }
     }
-
 
     private void zipDirectory(Path sourceDir, Path zipFilePath) throws IOException {
         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilePath.toFile()))) {
@@ -113,5 +115,20 @@ public class BackupManager {
                         }
                     });
         }
+    }
+
+    private void deleteDirectoryRecursively(Path directory) throws IOException {
+        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }
