@@ -1,20 +1,33 @@
 package com.project.config;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 public class Config {
-    private static Properties properties = new Properties();
-    private static String configFilePath = "config.properties";
+    private static final Properties properties = new Properties();
+    private static String configFilePath;
 
-    public static void loadConfig(String fileName) {
-        configFilePath = fileName;
-        try (InputStream input = new FileInputStream(configFilePath)) {
+    static {
+        try {
+            Path jarPath = Paths.get(Config.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+            configFilePath = jarPath.resolve("config.properties").toString();
+        } catch (URISyntaxException e) {
+            System.err.println("Ошибка определения пути к .jar-файлу: " + e.getMessage());
+            configFilePath = "config.properties";
+        }
 
-            properties.load(input);
-
-        } catch (Exception e) {
-            System.err.println("Ошибка при загрузке конфигурации: " + e.getMessage());
+        if (Files.exists(Paths.get(configFilePath))) {
+            try (InputStream input = new FileInputStream(configFilePath)) {
+                properties.load(input);
+            } catch (IOException e) {
+                System.err.println("Ошибка при загрузке конфигурации: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Файл конфигурации не найден. Будут использованы значения по умолчанию.");
         }
     }
 
