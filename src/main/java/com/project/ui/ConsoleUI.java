@@ -4,8 +4,6 @@ import com.project.backup.BackupManager;
 import com.project.restore.RestoreManager;
 import com.project.util.Logger;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.screen.*;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 
@@ -35,7 +33,7 @@ public class ConsoleUI {
         panel.addComponent(new Button("Создать резервную копию", () -> {
             mainWindow.close();
             closeGUI();
-            Logger.log("Запускаем BackupManager...");
+            Logger.log("Запуск процесса резервного копирования...");
             BackupManager backupManager = new BackupManager();
             backupManager.startBackup();
             Logger.log("Резервное копирование завершено!");
@@ -43,7 +41,7 @@ public class ConsoleUI {
         panel.addComponent(new Button("Восстановить резервную копию", () -> {
             mainWindow.close();
             closeGUI();
-            Logger.log("Запускаем RestoreManager...");
+            Logger.log("Запуск процесса восстановления резервной копии...");
             RestoreManager restoreManager = new RestoreManager();
             restoreManager.startRestore();
             Logger.log("Восстановление завершено!");
@@ -63,7 +61,7 @@ public class ConsoleUI {
             try {
                 screen.stopScreen();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Ошибка при остановке экрана: " + e.getMessage());
             }
         }
     }
