@@ -1,5 +1,8 @@
 package com.project.ui;
 
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.project.backup.BackupManager;
 import com.project.config.Config;
 import com.project.restore.RestoreManager;
@@ -69,59 +72,75 @@ public class ConsoleUI {
         Panel panel = new Panel();
         panel.setLayoutManager(new GridLayout(2));
 
+        int textBoxWidth = 60;
+
         panel.addComponent(new Label("Источник для копирования:"));
-        TextBox sourceTextBox = new TextBox().setText(
-                Config.getProperty("source.directory", System.getProperty("user.home"))
-        );
+        TextBox sourceTextBox = new TextBox(new TerminalSize(textBoxWidth, 1))
+                .setText(Config.getProperty("source.directory",
+                        System.getProperty("user.home") + "/Documents"));
         panel.addComponent(sourceTextBox);
 
         panel.addComponent(new Label("Каталог для резервных копий:"));
-        TextBox backupTextBox = new TextBox().setText(
-                Config.getProperty("backup.directory", System.getProperty("user.home"))
-        );
+        TextBox backupTextBox = new TextBox(new TerminalSize(textBoxWidth, 1))
+                .setText(Config.getProperty("backup.directory",
+                        System.getProperty("user.home") + "/backups"));
         panel.addComponent(backupTextBox);
 
         panel.addComponent(new Label("Каталог для восстановления:"));
-        TextBox restoreTextBox = new TextBox().setText(
-                Config.getProperty("restore.directory", System.getProperty("user.home"))
-        );
+        TextBox restoreTextBox = new TextBox(new TerminalSize(textBoxWidth, 1))
+                .setText(Config.getProperty("restore.directory",
+                        System.getProperty("user.home") + "/restores"));
+        panel.addComponent(new Label("Каталог для восстановления:"));
         panel.addComponent(restoreTextBox);
 
         Button saveButton = new Button("Сохранить", () -> {
             String sourcePath = sourceTextBox.getText().trim();
             String backupPath = backupTextBox.getText().trim();
             String restorePath = restoreTextBox.getText().trim();
+            StringBuilder message = new StringBuilder();
+
+            // Проверка на нахождение каталога резервной копии внутри источника
+            Path srcDir = Paths.get(sourcePath).toAbsolutePath();
+            Path bkpDir = Paths.get(backupPath).toAbsolutePath();
+            if(bkpDir.startsWith(srcDir)) {
+                MessageDialog.showMessageDialog(gui, "Ошибка", "Каталог резервной копии не может находиться внутри источника!", MessageDialogButton.OK);
+                return;
+            }
 
             // Проверка и создание директорий, если их нет
             boolean validationPassed = true;
+
             try {
-                Path srcDir = Paths.get(sourcePath);
                 if (!Files.exists(srcDir)) {
                     Files.createDirectories(srcDir);
-                    Logger.log("Создана директория источника: " + sourcePath);
+                    message.append("Создана директория источника: ").append(sourcePath).append("\n");
                 }
             } catch (IOException e) {
-                Logger.log("Ошибка при создании источника (" + sourcePath + "): " + e.getMessage());
+                message.append("Ошибка при создании источника (").append(sourcePath)
+                        .append("): ").append(e.getMessage()).append("\n");
                 validationPassed = false;
             }
+
             try {
-                Path bkpDir = Paths.get(backupPath);
                 if (!Files.exists(bkpDir)) {
                     Files.createDirectories(bkpDir);
-                    Logger.log("Создан каталог для резервных копий: " + backupPath);
+                    message.append("Создан каталог для резервных копий: ").append(backupPath).append("\n");
                 }
             } catch (IOException e) {
-                Logger.log("Ошибка при создании каталога резервных копий (" + backupPath + "): " + e.getMessage());
+                message.append("Ошибка при создании каталога резервных копий (").append(backupPath)
+                        .append("): ").append(e.getMessage()).append("\n");
                 validationPassed = false;
             }
+
             try {
                 Path rstDir = Paths.get(restorePath);
                 if (!Files.exists(rstDir)) {
                     Files.createDirectories(rstDir);
-                    Logger.log("Создан каталог для восстановления: " + restorePath);
+                    message.append("Создан каталог для восстановления: ").append(restorePath).append("\n");
                 }
             } catch (IOException e) {
-                Logger.log("Ошибка при создании каталога восстановления (" + restorePath + "): " + e.getMessage());
+                message.append("Ошибка при создании каталога восстановления (").append(restorePath)
+                        .append("): ").append(e.getMessage()).append("\n");
                 validationPassed = false;
             }
 
@@ -131,10 +150,12 @@ public class ConsoleUI {
                 Config.setProperty("backup.directory", backupPath);
                 Config.setProperty("restore.directory", restorePath);
                 Config.saveConfig();
-                Logger.log("Настройки успешно сохранены.");
+                message.append("Настройки успешно сохранены.");
             } else {
-                Logger.log("Настройки не сохранены из-за ошибок валидации.");
+                message.append("Настройки не сохранены из-за ошибок валидации.");
             }
+
+            MessageDialog.showMessageDialog(gui, "Результат сохранения", message.toString(), MessageDialogButton.OK);
             settingsWindow.close();
         });
 
