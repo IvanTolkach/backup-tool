@@ -33,7 +33,6 @@ public class ConsoleUI {
         panel.addComponent(new Button("Создать резервную копию", () -> {
             mainWindow.close();
             closeGUI();
-            Logger.log("Запуск процесса резервного копирования...");
             BackupManager backupManager = new BackupManager();
             backupManager.startBackup();
             Logger.log("Резервное копирование завершено!");
@@ -41,7 +40,6 @@ public class ConsoleUI {
         panel.addComponent(new Button("Восстановить резервную копию", () -> {
             mainWindow.close();
             closeGUI();
-            Logger.log("Запуск процесса восстановления резервной копии...");
             RestoreManager restoreManager = new RestoreManager();
             restoreManager.startRestore();
             Logger.log("Восстановление завершено!");

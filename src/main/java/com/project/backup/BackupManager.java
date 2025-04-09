@@ -21,7 +21,7 @@ public class BackupManager {
         Logger.log("Начало процесса резервного копирования...");
 
         Logger.log("Исходная директория для резервного копирования: " + sourceDirPath);
-        Logger.log("Целевой каталог для архивов (если параметр отсутствует, используется домашняя директория): " + backupDirPath);
+        Logger.log("Целевой каталог для архивов: " + backupDirPath);
 
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
