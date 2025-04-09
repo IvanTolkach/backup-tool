@@ -72,7 +72,7 @@ public class ConsoleUI {
         Panel panel = new Panel();
         panel.setLayoutManager(new GridLayout(2));
 
-        int textBoxWidth = 60;
+        int textBoxWidth = 30;
 
         panel.addComponent(new Label("Источник для копирования:"));
         TextBox sourceTextBox = new TextBox(new TerminalSize(textBoxWidth, 1))
